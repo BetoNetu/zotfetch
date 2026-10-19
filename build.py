@@ -1,8 +1,8 @@
-import zipfile
-import os
-import json
 import argparse
 import glob
+import json
+import os
+import zipfile
 
 
 def get_version_from_manifest(manifest_path="manifest.json"):
