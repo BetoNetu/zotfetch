@@ -737,44 +737,44 @@ var OaMgSourceResolver = class {
 // papers by scraping publisher sites. Multiple mirrors are tried.
 // Priority is set lower than OA sources but higher than paywalled ones.
 // ─────────────────────────────────────────────────────────────────────────────
-//var SciHubSourceResolver = class {
-//  constructor() { this.id = "scihub"; }
-//
-//  enabled() { return true; }
-//
-//  async buildCandidates(_item, ids) {
-//    if (!ids.doi) return [];
-//
-//    // Sci-Hub mirrors (matching Sci-PDF plugin)
-//    const mirrors = [
-//      "https://sci-hub.se",
-//      "https://sci-hub.st",
-//      "https://sci-hub.ru",
-//      "https://sci-hub.ren",
-//      "https://sci-hub.wf",
-//      "https://sci-hub.ee",
-//      "https://sci-hub.box",
-//      "https://sci-hub.red"
-//    ];
-//
-//    const candidates = [];
-//    let priority = 80;
-//
-//    for (const mirror of mirrors) {
-//      const url = `${mirror}/${ids.doi}`;
-//      candidates.push({
-//        sourceId: "scihub",
-//        label: "Sci-Hub",
-//        url,
-//        kind: "landing-page",
-//        priority: priority--,
-//        headers: Utils.getStealthHeaders()
-//      });
-//    }
+var SciHubSourceResolver = class {
+  constructor() { this.id = "scihub"; }
 
-//    return candidates;
-//  }
-//};
+  enabled() { return true; }
+
+  async buildCandidates(_item, ids) {
+    if (!ids.doi) return [];
+
+    // Sci-Hub mirrors (matching Sci-PDF plugin)
+    const mirrors = [
+      "https://sci-hub.se",
+      "https://sci-hub.st",
+      "https://sci-hub.ru",
+      "https://sci-hub.ren",
+      "https://sci-hub.wf",
+      "https://sci-hub.ee",
+      "https://sci-hub.box",
+      "https://sci-hub.red"
+    ];
+
+    const candidates = [];
+    let priority = 80;
+
+    for (const mirror of mirrors) {
+      const url = `${mirror}/${ids.doi}`;
+      candidates.push({
+        sourceId: "scihub",
+        label: "Sci-Hub",
+        url,
+        kind: "landing-page",
+        priority: priority--,
+        headers: Utils.getStealthHeaders()
+      });
+    }
+
+    return candidates;
+  }
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DoajSourceResolver

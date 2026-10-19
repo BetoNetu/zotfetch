@@ -15,7 +15,7 @@ class ZotFetchUI {
           target: "main/library/item",
           menus: [
             {
-              menuType: "submenu",
+              menuType: "menu",
               label: "ZotFetch",
               menus: [
                 {
@@ -42,7 +42,7 @@ class ZotFetchUI {
                   }
                 },
                 {
-                  menuType: "separator"
+                  menuType: "menuseparator"
                 },
                 {
                   menuType: "menuitem",
@@ -63,6 +63,9 @@ class ZotFetchUI {
                       ZotFetch.runRetryAfterAuth();
                     }
                   }
+                },
+                                {
+                  menuType: "menuseparator"
                 },
               ]
             }
