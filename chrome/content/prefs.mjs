@@ -1,4 +1,7 @@
 // chrome/content/prefs.mjs
+/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: This would imply a total tewrite uneceesarilyy */
+/** biome-ignore-all lint/correctness/noUnusedVariables: cloneInto é OBRIGATÓRIO para o XHTML conseguir ler o prefsBridge */
+/** biome-ignore-all lint/complexity/noStaticOnlyClass: This would imply a total tewrite uneceesarilyy */
 // Preferences manager
 
 const PREF_PREFIX = 'extensions.zotfetch.';
@@ -90,48 +93,48 @@ const SecureStorage = (() => {
 class ZotFetchPrefs {
   static getUnpaywallEmail() {
     const email = SecureStorage.get("unpaywallEmail");
-    return this.isValidEmail(email) ? email : FALLBACK_EMAIL;
+    return ZotFetchPrefs.isValidEmail(email) ? email : FALLBACK_EMAIL;
   }
 
   static isCapesEnabled() {
-    return Zotero.Prefs.get(PREF_PREFIX + 'enableCapesFallback', true);
+    return Zotero.Prefs.get(`${PREF_PREFIX}enableCapesFallback`, true);
   }
 
   static isAntiCaptchaMode() {
-    return Zotero.Prefs.get(PREF_PREFIX + 'antiCaptchaMode', true);
+    return Zotero.Prefs.get(`${PREF_PREFIX}antiCaptchaMode`, true);
   }
 
   static getRequestDelayMs() {
-    const ms = parseInt(Zotero.Prefs.get(PREF_PREFIX + 'requestDelayMs', true), 10);
+    const ms = parseInt(Zotero.Prefs.get(`${PREF_PREFIX}requestDelayMs`, true), 10);
     return Number.isFinite(ms) && ms >= 0 ? ms : 1400;
   }
 
   static isFastModeEnabled() {
-    return Zotero.Prefs.get(PREF_PREFIX + 'fastMode', true);
+    return Zotero.Prefs.get(`${PREF_PREFIX}fastMode`, true);
   }
 
   static getUnpaywallTimeoutMs() {
-    const ms = parseInt(Zotero.Prefs.get(PREF_PREFIX + 'unpaywallTimeoutMs', true), 10);
+    const ms = parseInt(Zotero.Prefs.get(`${PREF_PREFIX}unpaywallTimeoutMs`, true), 10);
     return Number.isFinite(ms) && ms >= 5000 ? ms : 12000;
   }
 
   static getCrossrefTimeoutMs() {
-    const ms = parseInt(Zotero.Prefs.get(PREF_PREFIX + 'crossrefTimeoutMs', true), 10);
+    const ms = parseInt(Zotero.Prefs.get(`${PREF_PREFIX}crossrefTimeoutMs`, true), 10);
     return Number.isFinite(ms) && ms >= 5000 ? ms : 10000;
   }
 
   static getBatchSize() {
-    const size = parseInt(Zotero.Prefs.get(PREF_PREFIX + 'batchSize', true), 10);
+    const size = parseInt(Zotero.Prefs.get(`${PREF_PREFIX}batchSize`, true), 10);
     return Number.isFinite(size) && size > 0 ? size : 30;
   }
 
   static getDomainGapMs() {
-    const ms = parseInt(Zotero.Prefs.get(PREF_PREFIX + 'domainGapMs', true), 10);
+    const ms = parseInt(Zotero.Prefs.get(`${PREF_PREFIX}domainGapMs`, true), 10);
     return Number.isFinite(ms) && ms >= 0 ? ms : 3000;
   }
 
   static getRequestTimeoutMs() {
-    const ms = parseInt(Zotero.Prefs.get(PREF_PREFIX + 'requestTimeoutMs', true), 10);
+    const ms = parseInt(Zotero.Prefs.get(`${PREF_PREFIX}requestTimeoutMs`, true), 10);
     return Number.isFinite(ms) && ms >= 5000 ? ms : 15000;
   }
 
@@ -144,7 +147,7 @@ class ZotFetchPrefs {
   }
 
   static isInstitutionalProxyEnabled() {
-    const url = this.getInstitutionalProxyUrl();
+    const url = ZotFetchPrefs.getInstitutionalProxyUrl();
     return !!url && url.trim().length > 0;
   }
 
@@ -152,6 +155,15 @@ class ZotFetchPrefs {
   // rate limit from ~10 req/min to 10k/day).
   static getCoreApiKey() {
     return SecureStorage.get("coreApiKey");
+  }
+  
+  // Secure key exposure
+  static getSecure(key) {
+  return SecureStorage.get(key);
+  }
+
+  static setSecure(key, value) {
+  SecureStorage.set(key, value);
   }
 
   static set(key, value) {
@@ -163,13 +175,17 @@ class ZotFetchPrefs {
    * Reads and writes directly to/from Zotero.Prefs via a bridge object
    * passed to the XHTML dialog through window.arguments[0].
    */
-  static openPrefsDialog() {
+  static async openPrefsDialog() {
     try {
       const win = Zotero.getMainWindow?.() ?? Zotero.getMainWindows?.()?.[0];
       if (!win) {
         Zotero.logError(new Error("[ZotFetch] openPrefsDialog: no main window available"));
         return;
       }
+      
+      const { AddonManager } = ChromeUtils.importESModule("resource://gre/modules/AddonManager.sys.mjs");
+      const addon = await AddonManager.getAddonByID("zotfetch@edslab.research");
+      const dialogUrl = addon.getResourceURI("chrome/content/prefs-dialog.xhtml").spec;
 
       // Bridge object: isolates the dialog from direct Zotero.Prefs access and
       // lets us pass functions across the chrome window boundary safely.
@@ -181,13 +197,18 @@ class ZotFetchPrefs {
         secureGet: (key)        => SecureStorage.get(key),
         secureSet: (key, value) => SecureStorage.set(key, value)
       };
-
-      const dialogUrl = ZotFetchPlugin.rootURI + "chrome/content/prefs-dialog.xhtml";
-      win.openDialog(
+      
+      const clonedBridge = Components.utils.cloneInto(prefsBridge, win, { 
+        cloneFunctions: true 
+      });
+      //const argArray = Cc["@mozilla.org/array;1"].createInstance(Ci.nsIMutableArray);
+      //argArray.appendElement(clonedBridge);
+      Services.ww.openWindow(
+        win,
         dialogUrl,
         "zotfetch-preferences",
-        "chrome,titlebar,centerscreen,resizable=yes,modal",
-        prefsBridge
+        "chrome,dialog=yes,centerscreen,resizable=yes,width=680,height=570",
+        null // Sem argumentos! A ponte está no opener.
       );
     } catch (error) {
       Zotero.logError(error);
@@ -196,9 +217,9 @@ class ZotFetchPrefs {
 
   // Backward-compatible alias — kept so any external callers still work.
   static openPrefs() {
-    return this.openPrefsDialog();
+    return ZotFetchPrefs.openPrefsDialog();
   }
-
+  
   static isValidEmail(email) {
     return !!email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
   }

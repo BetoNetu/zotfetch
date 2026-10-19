@@ -12,7 +12,8 @@
       "id": "zotfetch@edslab.research",
       "update_url": "https://raw.githubusercontent.com/fdossi/zotfetch/main/updates.json",
       "strict_min_version": "8.0.4",
-      "strict_max_version": "8.*"
+      "strict_max_version": "10.*"
     }
   }
 }
+ 

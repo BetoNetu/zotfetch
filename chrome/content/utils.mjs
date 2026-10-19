@@ -72,7 +72,7 @@ var Utils = {
     const normalize = (s) => String(s || '')
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
-      .replace(/[\-\u2013\u2014]/g, ' ')
+      .replace(/[-\u2013\u2014]/g, ' ')
       .replace(/[^a-z0-9\s]/g, '')
       .trim()
       .split(/\s+/)
@@ -100,7 +100,7 @@ var Utils = {
     try {
       return new URL(url).hostname.toLowerCase();
     } catch {
-      const match = String(url).match(/^https?:\/\/([^\/]+)/i);
+      const match = String(url).match(/^https?:\/\/([^/]+)/i);
       return match ? match[1] : '';
     }
   },

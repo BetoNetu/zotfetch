@@ -47,7 +47,7 @@ const _DOI_PREFIX_TO_HOST = {
 function _publisherHostFromDoi(doi) {
   if (!doi) return null;
   for (const [prefix, host] of Object.entries(_DOI_PREFIX_TO_HOST)) {
-    if (doi.startsWith(prefix + "/") || doi === prefix) return host;
+    if (doi.startsWith(`${prefix}/`) || doi === prefix) return host;
   }
   return null;
 }
@@ -63,7 +63,7 @@ var NativeSourceResolver = class {
 
   enabled() { return true; }
 
-  async buildCandidates(_item, ids) {
+  async buildCandidates(_item, _ids) {
     // Defence-in-depth for DOI prefixes not covered by the buildCandidates
     // filter: if a previous batch run already proved this (doi, publisher)
     // is bot-blocked, skip rather than let Zotero's real UA re-trigger it.
@@ -704,7 +704,7 @@ var OaMgSourceResolver = class {
           }
         });
       }
-    } catch (error) {
+    } catch (_error) {
       // API failed, fall back to landing page
     }
 
@@ -737,44 +737,44 @@ var OaMgSourceResolver = class {
 // papers by scraping publisher sites. Multiple mirrors are tried.
 // Priority is set lower than OA sources but higher than paywalled ones.
 // ─────────────────────────────────────────────────────────────────────────────
-var SciHubSourceResolver = class {
-  constructor() { this.id = "scihub"; }
+//var SciHubSourceResolver = class {
+//  constructor() { this.id = "scihub"; }
+//
+//  enabled() { return true; }
+//
+//  async buildCandidates(_item, ids) {
+//    if (!ids.doi) return [];
+//
+//    // Sci-Hub mirrors (matching Sci-PDF plugin)
+//    const mirrors = [
+//      "https://sci-hub.se",
+//      "https://sci-hub.st",
+//      "https://sci-hub.ru",
+//      "https://sci-hub.ren",
+//      "https://sci-hub.wf",
+//      "https://sci-hub.ee",
+//      "https://sci-hub.box",
+//      "https://sci-hub.red"
+//    ];
+//
+//    const candidates = [];
+//    let priority = 80;
+//
+//    for (const mirror of mirrors) {
+//      const url = `${mirror}/${ids.doi}`;
+//      candidates.push({
+//        sourceId: "scihub",
+//        label: "Sci-Hub",
+//        url,
+//        kind: "landing-page",
+//        priority: priority--,
+//        headers: Utils.getStealthHeaders()
+//      });
+//    }
 
-  enabled() { return true; }
-
-  async buildCandidates(_item, ids) {
-    if (!ids.doi) return [];
-
-    // Sci-Hub mirrors (matching Sci-PDF plugin)
-    const mirrors = [
-      "https://sci-hub.se",
-      "https://sci-hub.st",
-      "https://sci-hub.ru",
-      "https://sci-hub.ren",
-      "https://sci-hub.wf",
-      "https://sci-hub.ee",
-      "https://sci-hub.box",
-      "https://sci-hub.red"
-    ];
-
-    const candidates = [];
-    let priority = 80;
-
-    for (const mirror of mirrors) {
-      const url = `${mirror}/${ids.doi}`;
-      candidates.push({
-        sourceId: "scihub",
-        label: "Sci-Hub",
-        url,
-        kind: "landing-page",
-        priority: priority--,
-        headers: Utils.getStealthHeaders()
-      });
-    }
-
-    return candidates;
-  }
-};
+//    return candidates;
+//  }
+//};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DoajSourceResolver
@@ -987,7 +987,7 @@ var InstitutionalProxySourceResolver = class {
     if (!ids.doi) return [];
 
     const proxyBase = ZotFetchPrefs.getInstitutionalProxyUrl();
-    if (!proxyBase || !proxyBase.trim()) return [];
+    if (!proxyBase?.trim()) return [];
 
     const doiTarget = `https://doi.org/${encodeURI(ids.doi)}`;
     const proxied = ZotFetch.buildProxyTargetURL(proxyBase, doiTarget);

@@ -663,7 +663,7 @@ var SciHubPDFResolver = class {
     }
 
     // Sci-Hub specific extraction
-    let extracted = this._extractFromSciHub(doc, candidate.url);
+    const extracted = this._extractFromSciHub(doc, candidate.url);
 
     if (!extracted) {
       ctx.logger(`[SciHubPDFResolver] No PDF found (${Date.now() - t0}ms)`);
@@ -690,7 +690,7 @@ var SciHubPDFResolver = class {
   _extractFromSciHub(doc, base) {
     // Sci-Hub specific selectors
     // Look for iframe with id="pdf"
-    let iframe = doc.querySelector('iframe#pdf');
+    const iframe = doc.querySelector('iframe#pdf');
     if (iframe) {
       const src = iframe.getAttribute("src");
       if (src && /\.pdf/i.test(src)) return _resolveUrl(src, base);

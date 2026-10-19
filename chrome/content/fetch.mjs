@@ -78,6 +78,7 @@ const SAFE_OA_HOSTS = new Set([
   "oa.mg"                              // OA.mg open-access aggregator
 ]);
 
+// biome-ignore lint/complexity/noStaticOnlyClass: This would imply rewritting the whole logic, unecessarilly
 class ZotFetch {
   static cooldown = new CooldownManager();
   static failedItems = new Map(); // Map<itemId, {item, reason, doi}>

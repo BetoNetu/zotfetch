@@ -1,4 +1,5 @@
 // chrome/content/ui.mjs
+/** biome-ignore-all lint/complexity/noStaticOnlyClass: This would impluy a complete rebuild */
 // UI Module: Menus, progress, window management
 
 class ZotFetchUI {
@@ -8,13 +9,13 @@ class ZotFetchUI {
   static async init() {
     if (Zotero.MenuManager?.registerMenu) {
       try {
-        this.menuID = Zotero.MenuManager.registerMenu({
+        ZotFetchUI.menuID = Zotero.MenuManager.registerMenu({
           menuID: "zotfetch-main-menu",
-          pluginID: this.PLUGIN_ID,
+          pluginID: ZotFetchUI.PLUGIN_ID,
           target: "main/library/item",
           menus: [
             {
-              menuType: "menu",
+              menuType: "submenu",
               label: "ZotFetch",
               menus: [
                 {
@@ -41,7 +42,7 @@ class ZotFetchUI {
                   }
                 },
                 {
-                  menuType: "menuseparator"
+                  menuType: "separator"
                 },
                 {
                   menuType: "menuitem",
@@ -63,23 +64,11 @@ class ZotFetchUI {
                     }
                   }
                 },
-                {
-                  menuType: "menuseparator"
-                },
-                {
-                  menuType: "menuitem",
-                  label: "Preferences",
-                  onCommand: () => {
-                    if (typeof ZotFetchPrefs !== 'undefined') {
-                      ZotFetchPrefs.openPrefsDialog();
-                    }
-                  }
-                }
               ]
             }
           ]
         });
-        Zotero.debug(`ZotFetch MenuManager registered: ${this.menuID}`);
+        Zotero.debug(`ZotFetch MenuManager registered: ${ZotFetchUI.menuID}`);
       } catch (error) {
         Zotero.logError(error);
       }
@@ -89,7 +78,7 @@ class ZotFetchUI {
   // Fallback/legacy for DOM injection
   static addToAllWindows() {
     Zotero.getMainWindows().forEach(win => {
-      if (win.ZoteroPane) this.addToWindow(win);
+      if (win.ZoteroPane) ZotFetchUI.addToWindow(win);
     });
   }
 

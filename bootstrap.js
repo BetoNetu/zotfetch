@@ -1,4 +1,6 @@
 /* ZotFetch Bootstrap - Zotero 8 */
+/** biome-ignore-all lint/suspicious/useIterableCallbackReturn: This would imply an Unecessary rewrite */
+/** biome-ignore-all lint/correctness/noUnusedFunctionParameters: This would imply an Unecessary rewrite */
 
 // Global namespace
 var ZotFetchPlugin = {
@@ -19,22 +21,32 @@ var ZotFetchPlugin = {
     try {
       this.init({ id, version, rootURI });
 
-      Services.scriptloader.loadSubScript(rootURI + "chrome/content/utils.mjs");
-      Services.scriptloader.loadSubScript(rootURI + "chrome/content/prefs.mjs");
-      Services.scriptloader.loadSubScript(rootURI + "chrome/content/cooldown.mjs");
-      Services.scriptloader.loadSubScript(rootURI + "chrome/content/protected-hosts.mjs");
-      Services.scriptloader.loadSubScript(rootURI + "chrome/content/identifiers.mjs");
-      Services.scriptloader.loadSubScript(rootURI + "chrome/content/source-resolvers.mjs");
-      Services.scriptloader.loadSubScript(rootURI + "chrome/content/pdf-resolvers.mjs");
-      Services.scriptloader.loadSubScript(rootURI + "chrome/content/importer.mjs");
-      Services.scriptloader.loadSubScript(rootURI + "chrome/content/fetch.mjs");
-      Services.scriptloader.loadSubScript(rootURI + "chrome/content/ui.mjs");
+      Services.scriptloader.loadSubScript(`${rootURI}chrome/content/utils.mjs`);
+      Services.scriptloader.loadSubScript(`${rootURI}chrome/content/prefs.mjs`);
+      Services.scriptloader.loadSubScript(`${rootURI}chrome/content/cooldown.mjs`);
+      Services.scriptloader.loadSubScript(`${rootURI}chrome/content/protected-hosts.mjs`);
+      Services.scriptloader.loadSubScript(`${rootURI}chrome/content/identifiers.mjs`);
+      Services.scriptloader.loadSubScript(`${rootURI}chrome/content/source-resolvers.mjs`);
+      Services.scriptloader.loadSubScript(`${rootURI}chrome/content/pdf-resolvers.mjs`);
+      Services.scriptloader.loadSubScript(`${rootURI}chrome/content/importer.mjs`);
+      Services.scriptloader.loadSubScript(`${rootURI}chrome/content/fetch.mjs`);
+      Services.scriptloader.loadSubScript(`${rootURI}chrome/content/ui.mjs`);
 
       if (typeof ZotFetchUI === "undefined") {
         throw new Error("ZotFetchUI not loaded");
       }
 
       await ZotFetchUI.init();
+      
+      //Implement the Preference Pane off zotero
+      if (Zotero.PreferencePanes) {
+        Zotero.PreferencePanes.register({
+          pluginID: id,
+          src: `${rootURI}chrome/content/prefs-dialog.xhtml`,
+          stylesheets: [`${rootURI}chrome/content/prefs-dialog.css`],
+          label: "ZotFetch",
+        });
+      }
 
       // Only fall back to direct DOM injection when MenuManager did not
       // register the menu (Zotero version without MenuManager API, or
@@ -81,7 +93,6 @@ var ZotFetchPlugin = {
     ZotFetchUI.removeFromWindow(window);
   }
 };
-
 // Export for Zotero bootstrap
 this.startup = ZotFetchPlugin.startup.bind(ZotFetchPlugin);
 this.shutdown = ZotFetchPlugin.shutdown.bind(ZotFetchPlugin);
