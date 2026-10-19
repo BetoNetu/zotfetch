@@ -904,7 +904,7 @@ async function _validatePdf(url, headers, ctx, landingUrl) {
       ...Utils.getStealthHeaders(),
       ...(headers || {})
     };
-    if (landingUrl) reqHeaders["Referer"] = landingUrl;
+    if (landingUrl) reqHeaders.Referer = landingUrl;
     const head = await Zotero.HTTP.request("HEAD", url, {
       timeout: ctx.timeoutMs,
       headers: reqHeaders

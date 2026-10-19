@@ -754,7 +754,8 @@ var SciHubSourceResolver = class {
       "https://sci-hub.wf",
       "https://sci-hub.ee",
       "https://sci-hub.box",
-      "https://sci-hub.red"
+      "https://sci-hub.red",
+      "https://sci-net.xyz/"
     ];
 
     const candidates = [];
@@ -1088,3 +1089,4 @@ this.NativeDoiSourceResolver = NativeDoiSourceResolver;
 this.DoiLandingSourceResolver = DoiLandingSourceResolver;
 this.InstitutionalProxySourceResolver = InstitutionalProxySourceResolver;
 this.CapesSourceResolver = CapesSourceResolver;
+this.SciHubSourceResolver=SciHubSourceResolver
